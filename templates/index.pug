@@ -1,0 +1,31 @@
+doctype html
+html(encoding="utf-8")
+  head
+    meta(charset="utf-8")
+    meta(content="width=device-width, initial-scale=1, shrink-to-fit=no", name="viewport")
+    link(rel="stylesheet", href="assets/css/fonts.css")
+    link(rel="stylesheet", href="assets/css/main.css")
+    link(rel="stylesheet", href="assets/css/weather-icons.min.css")
+    script.
+      window.appLocale = '#{locale}';
+      // Configure HTMX to handle error responses
+      document.addEventListener('htmx:beforeSwap', function(evt) {
+        if(evt.detail.xhr.status >= 400){
+          evt.detail.shouldSwap = true;
+        }
+      });
+    script(src="assets/js/htmx.min.js")
+    script(src="assets/js/date.js")
+  body.grid-2
+    div
+      div.now
+        div
+          #time
+          #date
+      .grid-2
+        #birthdays(hx-get="/birthdays" hx-trigger="load, every 43200s")
+        #events(hx-get="/events" hx-trigger="load, every 43200s")
+      .grid-2
+        #calendar(hx-get="/calendar?type=appointments" hx-trigger="load, every 43200s")
+        #trash(hx-get="/calendar?type=trash" hx-trigger="load, every 43200s")
+    #weather(hx-get="/weather" hx-trigger="load, every 900s")

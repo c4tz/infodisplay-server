@@ -1,0 +1,12 @@
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto Flex';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/assets/font/roboto-flex-v29-regular.woff2') format('woff2');
+}
+
+body {
+  font-family: 'Roboto Flex', Arial, sans-serif;
+  background: lime; /* Andere Farbe als vorhin */
+}

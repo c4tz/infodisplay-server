@@ -1,0 +1,12 @@
+div
+  .title= title
+each entry in entries
+  div.entry
+    if entry.today
+      span.entry-date
+        b= entry.date
+      span.entry-title
+        b= entry.title
+    else
+      span.entry-date= entry.date
+      span.entry-title= entry.title

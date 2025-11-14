@@ -1,0 +1,61 @@
+accounts:
+  - caldav:
+      endpoint: https://caldav.icloud.com
+      mappings:
+        # name of the calendar which you want to display appointments from
+        appointments: Private
+    carddav:
+      endpoint: https://contacts.icloud.com
+    auth:
+      basic:
+        username: some@email.com
+        password: apple-app-password
+  - caldav:
+      endpoint: https://apidata.googleusercontent.com/caldav/v2/
+      mappings:
+        # for Google, the main calendar usually is named after your email
+        appointments: "example@gmail.com"
+        # name of the calendar in which you sync the trash dates,
+        # e.g. from your town's waste disposal company's website
+        trash: Trash
+    carddav:
+      # also, your mail must be in the URL for contacts
+      endpoint: https://www.googleapis.com/carddav/v1/principals/example%40gmail.com/
+    auth:
+      oauth:
+        token_url: "https://accounts.google.com/o/oauth2/token"
+        username: "example@gmail.com"
+        client_id: 1234567890-abcxyz.apps.googleusercontent.com
+        client_secret: top-secret
+        refresh_token: very-long-string
+
+settings:
+  timezone: "Europe/Helsinki"
+  locale: "en"
+  # number of future days to display for each section
+  appointments_days: 14
+  trash_days: 14
+  birthday_days: 14
+  event_days: 14
+  # enable test mode to use mocked data instead of real API calls
+  test: false
+
+events:
+  country: nz
+  city: christchurch
+  postal_codes: ["8024", "8140"]
+  title_replacements:
+    - search: "National Provincial Championship - "
+      replace: ""
+
+trash:
+  title_replacements:
+    - search: "Pickup: "
+      replace: ""
+    - search: "collection"
+      replace: ""
+
+weather:
+  # Tsuruga, Japan
+  latitude: "35.65"
+  longitude: "136.0625"
