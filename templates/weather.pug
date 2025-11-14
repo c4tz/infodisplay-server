@@ -1,0 +1,31 @@
+.grid-2.now
+  div
+    i(id="weather-icon" class=`wi wi-${weather.current.icon}`)
+  #weather-label
+    p #{weather.current.temperature}°C
+      br
+      | #{weather.current.weather}
+      br
+      | UV: #{weather.current.uv}
+
+.forecast#hourly
+  each hour in weather.hourly
+    div
+      .title= hour.time
+      i(class=`wi wi-${hour.icon}`)
+      p #{hour.temperature}°C
+        br
+        | #{hour.weather}
+        br
+        | UV: #{hour.uv}
+        br
+        | #{hour.precipitation}
+
+.forecast#daily
+  each day in weather.daily
+    div
+      .title= day.day
+      i(class=`wi wi-${day.icon}`)
+      p #{day.tempMax} / #{day.tempMin}°C
+        br
+        | #{day.weather}

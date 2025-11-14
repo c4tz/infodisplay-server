@@ -1,0 +1,11 @@
+services:
+  dev:
+    build: .
+    entrypoint: ["sh", "-c"]
+    command: ["npm install && npm run dev"]
+    environment:
+      TZ: "Europe/Berlin"
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
