@@ -68,6 +68,7 @@ export async function fetchWeatherData(
   config: any,
 ): Promise<ProcessedWeatherData> {
   const weatherConfig = config.weather;
+  const locationConfig = config.location;
   // Merge default mappings with config overrides
   const mappings = {
     ...WEATHER_CODE_ICON_MAPPINGS,
@@ -83,8 +84,8 @@ export async function fetchWeatherData(
 
   const weatherUrl =
     `https://api.open-meteo.com/v1/forecast` +
-    `?latitude=${weatherConfig.latitude}` +
-    `&longitude=${weatherConfig.longitude}` +
+    `?latitude=${locationConfig.latitude}` +
+    `&longitude=${locationConfig.longitude}` +
     `&daily=weather_code,temperature_2m_min,temperature_2m_max,uv_index_max` +
     `&hourly=temperature_2m,weather_code,precipitation_probability,uv_index,is_day` +
     `&current=temperature_2m,weather_code,is_day,uv_index` +

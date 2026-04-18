@@ -12,13 +12,18 @@ const EVENT_FORMAT = {
 
 export interface FetchedEvent {
   title: string;
-  start: string;
-  formatted_address: string;
-  entity_name?: string;
+  start_local: string;
+  phq_attendance: number;
+  geo: {
+    address: {
+      postcode: string;
+      formatted_address: string;
+    };
+  };
 }
 
 export interface EventsResponse {
-  scheduled_events: FetchedEvent[];
+  attended_events: FetchedEvent[];
 }
 
 export async function fetchEventsData(config: any): Promise<Event[]> {
@@ -30,20 +35,48 @@ export async function fetchEventsData(config: any): Promise<Event[]> {
 
   try {
     const {
-      country,
-      city,
       postal_codes: postalCodes,
+      attendance_threshold: attendanceThreshold,
       title_replacements: titleReplacements,
     } = config.events;
 
-    const url = `https://service-api.phq.io/website-events/cities/${country}/${city}`;
+    const { latitude, longitude } = config.location;
+    const baseUrl =
+      "https://service-api.phq.io/website-events/predicted-impact-report";
+
+    const locationResponse = await axios.post<{ location_id: string }>(
+      `${baseUrl}`,
+      {
+        origin_geojson: {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [Number(longitude), Number(latitude)],
+          },
+        },
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const locationId = locationResponse.data.location_id;
+
+    // Wait for 2 seconds before the next request,
+    // as the server will respond with 404 else
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const url = `${baseUrl}/${locationId}/events`;
     const response = await axios.get<EventsResponse>(url);
-    const events = response.data.scheduled_events;
+    const events = response.data.attended_events;
 
     const today = dayjs().startOf("day");
 
     const filteredEvents = events.filter((event) => {
-      const eventDate = dayjs(event.start);
+      const eventDate = dayjs(event.start_local);
       const inDateRange = eventDate.isBetween(
         today,
         today.add(config.settings.event_days, "day"),
@@ -51,10 +84,11 @@ export async function fetchEventsData(config: any): Promise<Event[]> {
         "[]",
       );
       const inPLZ = postalCodes.some((code: string) =>
-        event.formatted_address.includes(code),
+        event.geo.address.postcode.includes(code),
       );
-      const wholeCity = !event.entity_name;
-      return inDateRange && (inPLZ || wholeCity);
+      const wholeCity = !event.geo.address.postcode;
+      const aboveThreshold = event.phq_attendance >= attendanceThreshold;
+      return inDateRange && (inPLZ || wholeCity) && aboveThreshold;
     });
 
     const unprocessed: Unprocessed[] = filteredEvents.map((entry) => {
@@ -63,7 +97,7 @@ export async function fetchEventsData(config: any): Promise<Event[]> {
       });
       return {
         title: entry.title,
-        date: dayjs(entry.start),
+        date: dayjs(entry.start_local),
       };
     });
 
