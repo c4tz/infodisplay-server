@@ -83,10 +83,13 @@ export async function fetchEventsData(config: any): Promise<Event[]> {
         "day",
         "[]",
       );
-      const inPLZ = postalCodes.some((code: string) =>
-        event.geo.address.postcode.includes(code),
-      );
-      const wholeCity = !event.geo.address.postcode;
+
+      const postcode = event.geo.address.postcode;
+
+      const wholeCity = !postcode;
+      const inPLZ =
+        !!postcode &&
+        postalCodes.some((code: string) => postcode.includes(code));
       const aboveThreshold = event.phq_attendance >= attendanceThreshold;
       return inDateRange && (inPLZ || wholeCity) && aboveThreshold;
     });
